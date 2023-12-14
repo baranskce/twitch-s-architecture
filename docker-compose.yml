@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  master-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: masteruser
+      POSTGRES_PASSWORD: masterpassword
+      POSTGRES_DB: twitchdb
+    ports:
+      - "5432:5432"
+    networks:
+      - twitch-net
+
+  read-replica-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: replicouser
+      POSTGRES_PASSWORD: replicatepassword
+      POSTGRES_DB: twitchdb
+      POSTGRES_REPLICATION: 'slave'
+    depends_on:
+      - master-db
+    ports:
+      - "5433:5432"
+    networks:
+      - twitch-net
+    command: ["-c", "hot_standby=on"]
+
+  pgbouncer:
+    image: pgbouncer/pgbouncer
+    depends_on:
+      - master-db
+      - read-replica-db
+    ports:
+      - "6432:6432"
+    networks:
+      - twitch-net
+    volumes:
+      - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+
+networks:
+  twitch-net:
+    driver: bridge

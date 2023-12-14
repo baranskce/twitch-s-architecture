@@ -1,0 +1,3 @@
+The architecture shows read replicas and regional distribution, which suggests that Twitch scales its database horizontally to handle read loads across different geographies.
+
+PostgreSQL’s transactional integrity ensures that data remains consistent even during high-volume operations. Also, PostgreSQL has a strong track record of ACID compliance and fault tolerance, which is critical for a service like Twitch that needs to be available 24/7.
